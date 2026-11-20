@@ -19,7 +19,7 @@ Program normal bir uygulama gibi menüden açılır, ama sistemden yalıtılmı�
 ## Kullanım
 
 ```bash
-git clone https://github.com/KULLANICI_ADIN/fedora-davinci-resolve.git
+git clone https://github.com/abdullahnil/fedora-davinci-resolve.git
 cd fedora-davinci-resolve
 ./kur.sh
 ```
