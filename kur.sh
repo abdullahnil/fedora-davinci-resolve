@@ -55,6 +55,7 @@ echo "${Y}DaVinci Resolve — Fedora kurulumu${N}"
 # ---------- 1. ekran kartı ----------
 adim "1/6 Ekran kartı kontrol ediliyor"
 NVIDIA=false
+AMD=false
 if lspci 2>/dev/null | grep -iE 'vga|3d|display' | grep -qi nvidia; then
     NVIDIA=true
     if nvidia-smi >/dev/null 2>&1; then
@@ -76,6 +77,7 @@ if lspci 2>/dev/null | grep -iE 'vga|3d|display' | grep -qi nvidia; then
         fi
     fi
 elif lspci 2>/dev/null | grep -iE 'vga|3d|display' | grep -qiE 'amd|ati'; then
+    AMD=true
     bilgi "AMD ekran kartı bulundu (OpenCL / ROCm ile çalışır)."
 else
     uyari "NVIDIA veya AMD ekran kartı bulunamadı. Resolve yalnızca Intel grafikle çok yavaş çalışabilir."
@@ -166,6 +168,14 @@ distrobox enter "$KAPSAYICI" -- test -x /opt/resolve/bin/resolve || hata "Resolv
 
 # ---------- 6. son ayarlar ----------
 adim "6/6 Son ayarlar"
+if $AMD; then
+    # davincibox, AMD'de OpenCL'i (rusticl) yalnızca "run-davinci -c" ile açıyor
+    for f in "$HOME/.local/share/applications/DaVinciResolve.desktop" \
+             "$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME/Desktop")/com.blackmagicdesign.resolve.desktop"; do
+        [ -f "$f" ] && sed -i 's#/usr/bin/run-davinci /opt/resolve#/usr/bin/run-davinci -c /opt/resolve#' "$f"
+    done
+    bilgi "AMD için OpenCL (rusticl) kısayollarda açıldı."
+fi
 update-desktop-database "$HOME/.local/share/applications" 2>/dev/null || true
 mkdir -p "$HOME/Videos/Resolve Önbellek"
 bilgi "Önbellek klasörü: ~/Videos/Resolve Önbellek"
